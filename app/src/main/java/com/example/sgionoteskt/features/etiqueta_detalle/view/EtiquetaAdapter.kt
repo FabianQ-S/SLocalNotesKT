@@ -11,10 +11,11 @@ import com.example.sgionoteskt.R
 import com.example.sgionoteskt.data.model.Etiqueta
 
 class EtiquetaAdapter(
-    private val etiquetas: List<Etiqueta>
+    private val etiquetas: List<Etiqueta>,
+    seleccionadasIniciales: List<Int> = listOf()
 ) : RecyclerView.Adapter<EtiquetaAdapter.EtiquetaViewHolder>() {
 
-    val seleccionadas = mutableSetOf<Int>()
+    val seleccionadas = seleccionadasIniciales.toMutableSet()
 
     inner class EtiquetaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivIcono: ImageView = itemView.findViewById(R.id.ivIconoEtiqueta)

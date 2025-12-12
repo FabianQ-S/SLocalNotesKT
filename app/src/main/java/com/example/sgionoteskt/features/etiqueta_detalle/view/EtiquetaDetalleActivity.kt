@@ -1,5 +1,6 @@
 package com.example.sgionoteskt.features.etiqueta_detalle.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
@@ -18,6 +19,7 @@ import kotlinx.coroutines.launch
 class EtiquetaDetalleActivity : AppCompatActivity() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: EtiquetaAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +27,7 @@ class EtiquetaDetalleActivity : AppCompatActivity() {
         setContentView(R.layout.activity_etiqueta_detalle)
         setupToolbar()
 
+        val idsSeleccionadas = intent.getIntegerArrayListExtra("idsSeleccionadas") ?: arrayListOf()
         recyclerView = findViewById(R.id.recyclerViewEtiquetas)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.detailTag)) { v, insets ->
@@ -35,7 +38,7 @@ class EtiquetaDetalleActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             val etiquetas = App.database.etiquetaDao().obtenerEtiquetas()
-            val adapter = EtiquetaAdapter(etiquetas)
+            adapter = EtiquetaAdapter(etiquetas, idsSeleccionadas)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = LinearLayoutManager(this@EtiquetaDetalleActivity)
         }
@@ -45,10 +48,21 @@ class EtiquetaDetalleActivity : AppCompatActivity() {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     // TODO: LOGICA DE ASOCIACION DE ETIQUETAS SELECCIONADAS CON NOTA
-                    finish()
+                    devolverEtiquetasSeleccionadas()
                 }
             })
 
+    }
+
+    private fun devolverEtiquetasSeleccionadas() {
+        val intent = Intent().apply {
+            putIntegerArrayListExtra(
+                "seleccionadas",
+                ArrayList(adapter.seleccionadas)
+            )
+        }
+        setResult(RESULT_OK, intent)
+        finish()
     }
 
     private fun setupToolbar() {
@@ -63,8 +77,7 @@ class EtiquetaDetalleActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                // TODO: LOGICA DE ASOCIACION DE ETIQUETAS SELECCIONADAS CON NOTA
-                finish()
+                devolverEtiquetasSeleccionadas()
                 true
             }
 

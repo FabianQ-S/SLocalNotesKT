@@ -1,6 +1,7 @@
 package com.example.sgionoteskt.features.nota_detalle.view
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -9,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -17,8 +20,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.sgionoteskt.R
 import com.example.sgionoteskt.app.App
+import com.example.sgionoteskt.data.model.Etiqueta
+import com.example.sgionoteskt.data.model.EtiquetaNotaCrossRef
 import com.example.sgionoteskt.data.model.Nota
 import com.example.sgionoteskt.features.etiqueta_detalle.view.EtiquetaDetalleActivity
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +39,7 @@ class NotaDetalleActivity : AppCompatActivity() {
     private lateinit var btnDelete: FloatingActionButton
     private lateinit var btnEtiqueta: FloatingActionButton
     private lateinit var layoutAcciones: LinearLayout
+    private lateinit var etiquetaLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,10 +65,44 @@ class NotaDetalleActivity : AppCompatActivity() {
                     .show()
             }
 
+            etiquetaLauncher = registerForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val seleccionadas =
+                        result.data?.getIntegerArrayListExtra("seleccionadas") ?: arrayListOf()
+
+                    asociarEtiquetasANota(seleccionadas) {
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            val notaConEtiquetas = App.database.notaDao().obtenerNotaConEtiquetas(nota!!.idNota)
+                            withContext(Dispatchers.Main) {
+                                mostrarEtiquetas(notaConEtiquetas.etiquetas)
+                            }
+                        }
+                    }
+                }
+            }
+
+
             btnEtiqueta.setOnClickListener {
-                val intent = Intent(this,
-                    EtiquetaDetalleActivity::class.java)
-                startActivity(intent)
+                val intent = Intent(this, EtiquetaDetalleActivity::class.java)
+
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val notaConEtiquetas = App.database.notaDao().obtenerNotaConEtiquetas(nota!!.idNota)
+                    val idsEtiquetas = ArrayList(notaConEtiquetas.etiquetas.map { it.idEtiqueta })
+
+                    withContext(Dispatchers.Main) {
+                        intent.putIntegerArrayListExtra("idsSeleccionadas", idsEtiquetas)
+                        etiquetaLauncher.launch(intent)
+                    }
+                }
+            }
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val notaConEtiquetas = App.database.notaDao().obtenerNotaConEtiquetas(nota!!.idNota)
+                withContext(Dispatchers.Main) {
+                    mostrarEtiquetas(notaConEtiquetas.etiquetas)
+                }
             }
         }
 
@@ -160,4 +202,40 @@ class NotaDetalleActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun asociarEtiquetasANota(idsEtiquetas: List<Int>, callback: (() -> Unit)? = null) {
+        val notaActual = nota ?: return
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val dao = App.database.etiquetaNotaDao()
+
+            dao.eliminarRelacionesPorNota(notaActual.idNota)
+
+            idsEtiquetas.forEach { idEtiqueta ->
+                dao.insertarRelacion(EtiquetaNotaCrossRef(idEtiqueta, notaActual.idNota))
+            }
+
+            withContext(Dispatchers.Main) {
+                callback?.invoke()
+            }
+        }
+    }
+
+    private fun mostrarEtiquetas(etiquetas: List<Etiqueta>) {
+        val chipGroup = findViewById<ChipGroup>(R.id.chipGroupSelectedTags)
+        chipGroup.removeAllViews()
+
+        etiquetas.forEach { etiqueta ->
+            val chip = Chip(this).apply {
+                text = etiqueta.nombre
+                isClickable = false
+                isCheckable = false
+                setChipBackgroundColorResource(R.color.chipSelectedText)
+                setTextColor(Color.WHITE)
+            }
+            chipGroup.addView(chip)
+        }
+    }
+
+
 }
