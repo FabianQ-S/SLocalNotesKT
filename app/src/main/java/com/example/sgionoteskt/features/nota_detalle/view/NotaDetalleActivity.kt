@@ -1,5 +1,6 @@
 package com.example.sgionoteskt.features.nota_detalle.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.sgionoteskt.R
 import com.example.sgionoteskt.app.App
 import com.example.sgionoteskt.data.model.Nota
+import com.example.sgionoteskt.features.etiqueta_detalle.view.EtiquetaDetalleActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,6 +55,12 @@ class NotaDetalleActivity : AppCompatActivity() {
                     }
                     .setNegativeButton("No", null)
                     .show()
+            }
+
+            btnEtiqueta.setOnClickListener {
+                val intent = Intent(this,
+                    EtiquetaDetalleActivity::class.java)
+                startActivity(intent)
             }
         }
 

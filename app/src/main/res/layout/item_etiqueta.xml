@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <!-- Icono de etiqueta -->
+        <ImageView
+            android:id="@+id/ivIconoEtiqueta"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="Etiqueta"
+            android:src="@drawable/tag_icon"
+            android:tint="@color/black" />
+
+        <!-- Nombre de la etiqueta -->
+        <TextView
+            android:id="@+id/tvNombreEtiqueta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:text="Etiqueta"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+        <!-- Checkbox -->
+        <CheckBox
+            android:id="@+id/cbSeleccionar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+
+</com.google.android.material.card.MaterialCardView>
