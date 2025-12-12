@@ -6,10 +6,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.example.sgionoteskt.R
 import com.example.sgionoteskt.data.model.Nota
+import com.example.sgionoteskt.data.model.NotaConEtiquetas
 
 class NotaAdapter(
     private val onClick: (Nota) -> Unit
-) : ListAdapter<Nota, NotaViewHolder>(DiffCallback()) {
+) : ListAdapter<NotaConEtiquetas, NotaViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NotaViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -21,13 +22,11 @@ class NotaAdapter(
         holder.bind(getItem(position))
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<Nota>() {
-        override fun areItemsTheSame(oldItem: Nota, newItem: Nota) =
-            oldItem.idNota == newItem.idNota
+    class DiffCallback : DiffUtil.ItemCallback<NotaConEtiquetas>() {
+        override fun areItemsTheSame(oldItem: NotaConEtiquetas, newItem: NotaConEtiquetas) =
+            oldItem.nota.idNota == newItem.nota.idNota
 
-        override fun areContentsTheSame(oldItem: Nota, newItem: Nota) =
+        override fun areContentsTheSame(oldItem: NotaConEtiquetas, newItem: NotaConEtiquetas) =
             oldItem == newItem
     }
 }
-
-

@@ -22,8 +22,15 @@ interface NotaDao {
     @Delete
     suspend fun eliminar(nota: Nota)
 
+    @Transaction
+    @Query("SELECT * FROM notas WHERE esta_eliminado = 0 ORDER BY ultima_modificacion DESC")
+    fun obtenerNotasConEtiquetas(): Flow<List<NotaConEtiquetas>>
+
     @Query("SELECT * FROM notas WHERE esta_eliminado = 0 ORDER BY ultima_modificacion DESC")
     fun obtenerNotas(): Flow<List<Nota>>
+
+    @Query("SELECT * FROM notas WHERE esta_eliminado = 1 ORDER BY ultima_modificacion DESC")
+    fun obtenerNotasDePapelera(): Flow<List<Nota>>
 
     @Transaction
     @Query("SELECT * FROM notas WHERE id_nota = :id")

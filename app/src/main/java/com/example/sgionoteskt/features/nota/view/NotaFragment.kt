@@ -37,7 +37,7 @@ class NotaFragment : Fragment() {
         recyclerView.adapter = adapter
 
         lifecycleScope.launchWhenStarted {
-            App.database.notaDao().obtenerNotas().collect { notas ->
+            App.database.notaDao().obtenerNotasConEtiquetas().collect { notas ->
                 adapter.submitList(notas) {
                     recyclerView.scrollToPosition(0)
                 }
