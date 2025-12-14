@@ -63,15 +63,19 @@ class NotaDetalleActivity : AppCompatActivity() {
             }
 
             btnDelete.setOnClickListener {
-                AlertDialog.Builder(this)
-                    .setTitle("Mover a Papelera")
-                    .setMessage("¿Estas seguro de querer mover esta nota a la papelera?")
-                    .setPositiveButton("Sí") { _, _ ->
-                        moverNotaAPapelera()
-                        Toast.makeText(this, "Nota movida a la papelera", Toast.LENGTH_SHORT).show()
-                    }
-                    .setNegativeButton("No", null)
-                    .show()
+                val builder = AlertDialog.Builder(this)
+                builder.setMessage("La nota se enviará a papelera")
+                builder.setNegativeButton("Cancelar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                builder.setPositiveButton("Aceptar") { dialog, _ ->
+                    moverNotaAPapelera()
+                    dialog.dismiss()
+                }
+                val alertDialog = builder.create()
+                alertDialog.show()
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(android.graphics.Color.parseColor("#4DD0E1"))
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(android.graphics.Color.parseColor("#4DD0E1"))
             }
 
             etiquetaLauncher = registerForActivityResult(
@@ -237,6 +241,7 @@ class NotaDetalleActivity : AppCompatActivity() {
                 )
             )
             withContext(Dispatchers.Main) {
+                Toast.makeText(this@NotaDetalleActivity, "Nota enviada a papelera", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }

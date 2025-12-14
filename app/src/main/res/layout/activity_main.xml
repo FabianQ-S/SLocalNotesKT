@@ -44,6 +44,10 @@
                     android:textStyle="bold"
                     android:padding="8dp"/>
 
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="48dp" />
+
             </LinearLayout>
 
             <FrameLayout

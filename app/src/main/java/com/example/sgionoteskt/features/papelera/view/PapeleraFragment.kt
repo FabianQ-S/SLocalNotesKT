@@ -1,60 +1,129 @@
 package com.example.sgionoteskt.features.papelera.view
 
+import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.sgionoteskt.R
+import com.example.sgionoteskt.app.App
+import com.example.sgionoteskt.data.model.Nota
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [PapeleraFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class PapeleraFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: PapeleraAdapter
+    private lateinit var btnVaciar: Button
+    private lateinit var txtVacio: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_papelera, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PapeleraFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            PapeleraFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerView = view.findViewById(R.id.rvNotasPapelera)
+        btnVaciar = view.findViewById(R.id.btnVaciarPapelera)
+        txtVacio = view.findViewById(R.id.txtVacio)
+
+        adapter = PapeleraAdapter { nota ->
+            mostrarDialogoAccion(nota)
+        }
+
+        recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        recyclerView.adapter = adapter
+
+        btnVaciar.setOnClickListener {
+            mostrarDialogoVaciarPapelera()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            App.database.notaDao().obtenerNotasDePapelera().collectLatest { notas ->
+                adapter.submitList(notas)
+                if (notas.isEmpty()) {
+                    txtVacio.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+                } else {
+                    txtVacio.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
                 }
             }
+        }
+    }
+
+    private fun mostrarDialogoAccion(nota: Nota) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage("Desea restaurar o eliminar permanentemente la nota?")
+        builder.setNegativeButton("Eliminar") { dialog, _ ->
+            eliminarPermanentemente(nota)
+            dialog.dismiss()
+        }
+        builder.setPositiveButton("Restaurar") { dialog, _ ->
+            restaurarNota(nota)
+            dialog.dismiss()
+        }
+        val alertDialog = builder.create()
+        alertDialog.show()
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(Color.RED)
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(Color.parseColor("#4DD0E1"))
+    }
+
+    private fun mostrarDialogoVaciarPapelera() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage("¿Está seguro de borrar todas las notas en papelera?")
+        builder.setNegativeButton("Cancelar") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.setPositiveButton("Borrar") { dialog, _ ->
+            vaciarPapelera()
+            dialog.dismiss()
+        }
+        val alertDialog = builder.create()
+        alertDialog.show()
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(Color.parseColor("#4DD0E1"))
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(Color.RED)
+    }
+
+    private fun restaurarNota(nota: Nota) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            App.database.notaDao().restaurarNota(nota.idNota, System.currentTimeMillis())
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "Nota restaurada", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun eliminarPermanentemente(nota: Nota) {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            App.database.notaDao().eliminarPermanentemente(nota.idNota)
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "Nota eliminada permanentemente", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun vaciarPapelera() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            App.database.notaDao().vaciarPapelera()
+            withContext(Dispatchers.Main) {
+                Toast.makeText(requireContext(), "Papelera vaciada", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

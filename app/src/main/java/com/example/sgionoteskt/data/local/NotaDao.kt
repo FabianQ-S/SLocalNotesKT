@@ -36,4 +36,14 @@ interface NotaDao {
     @Query("SELECT * FROM notas WHERE id_nota = :id")
     suspend fun obtenerNotaConEtiquetas(id: Int): NotaConEtiquetas
 
+    @Query("UPDATE notas SET esta_eliminado = 0, ultima_modificacion = :timestamp WHERE id_nota = :id")
+    suspend fun restaurarNota(id: Int, timestamp: Long)
+
+    @Query("DELETE FROM notas WHERE id_nota = :id")
+    suspend fun eliminarPermanentemente(id: Int)
+
+    @Query("DELETE FROM notas WHERE esta_eliminado = 1")
+    suspend fun vaciarPapelera()
+
 }
+
