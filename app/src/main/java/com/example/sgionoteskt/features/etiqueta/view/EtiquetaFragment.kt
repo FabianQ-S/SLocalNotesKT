@@ -30,6 +30,7 @@ class EtiquetaFragment : Fragment() {
     private lateinit var txtVacio: TextView
     private lateinit var etNuevaEtiqueta: EditText
     private lateinit var btnAddTag: ImageView
+    private var isAddingTag = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,17 +84,20 @@ class EtiquetaFragment : Fragment() {
     }
 
     private fun agregarEtiqueta() {
+        if (isAddingTag) return
         val nombre = etNuevaEtiqueta.text.toString().trim()
         if (nombre.isEmpty()) {
             Toast.makeText(requireContext(), "Ingresa un nombre para la etiqueta", Toast.LENGTH_SHORT).show()
             return
         }
 
+        isAddingTag = true
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
             App.database.etiquetaDao().insertar(Etiqueta(nombre = nombre))
             withContext(Dispatchers.Main) {
                 etNuevaEtiqueta.text.clear()
                 Toast.makeText(requireContext(), "Etiqueta creada", Toast.LENGTH_SHORT).show()
+                isAddingTag = false
             }
         }
     }

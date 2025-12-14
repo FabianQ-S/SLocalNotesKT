@@ -54,7 +54,7 @@ class PapeleraFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            App.database.notaDao().obtenerNotasDePapelera().collectLatest { notas ->
+            App.database.notaDao().obtenerNotasDePapeleraConEtiquetas().collectLatest { notas ->
                 adapter.submitList(notas)
                 if (notas.isEmpty()) {
                     txtVacio.visibility = View.VISIBLE

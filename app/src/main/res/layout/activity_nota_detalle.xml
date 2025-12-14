@@ -52,23 +52,31 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <!-- Detalles -->
-        <EditText
-            android:id="@+id/etmDetalleNota"
-            style="@style/TEXT"
-            android:hint="Escribe tu nota aquí..."
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:layout_marginTop="13dp"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@android:color/transparent"
-            android:gravity="start|top"
-            android:inputType="textMultiLine"
-            android:textSize="16sp"
-            android:lineSpacingExtra="4dp"
-            android:padding="2dp"
+            android:fillViewport="true"
             app:layout_constraintTop_toBottomOf="@+id/divider"
-            app:layout_constraintBottom_toTopOf="@+id/chipGroupSelectedTags" />
+            app:layout_constraintBottom_toTopOf="@+id/chipGroupSelectedTags">
+
+            <EditText
+                android:id="@+id/etmDetalleNota"
+                style="@style/TEXT"
+                android:hint="Escribe tu nota aquí..."
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:gravity="start|top"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:imeOptions="actionNone"
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:padding="2dp" />
+
+        </ScrollView>
 
         <!-- Etiquetas seleccionadas con scroll horizontal -->
         <HorizontalScrollView

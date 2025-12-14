@@ -33,6 +33,10 @@ interface NotaDao {
     fun obtenerNotasDePapelera(): Flow<List<Nota>>
 
     @Transaction
+    @Query("SELECT * FROM notas WHERE esta_eliminado = 1 ORDER BY ultima_modificacion DESC")
+    fun obtenerNotasDePapeleraConEtiquetas(): Flow<List<NotaConEtiquetas>>
+
+    @Transaction
     @Query("SELECT * FROM notas WHERE id_nota = :id")
     suspend fun obtenerNotaConEtiquetas(id: Int): NotaConEtiquetas
 

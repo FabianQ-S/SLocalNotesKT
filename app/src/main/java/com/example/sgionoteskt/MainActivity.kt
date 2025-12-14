@@ -109,6 +109,11 @@ class MainActivity : AppCompatActivity() {
                     loadFragment(papeleraFragment)
                     navigation.selectedItemId = R.id.trash
                 }
+                R.id.nav_github -> {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
+                    intent.data = android.net.Uri.parse("https://github.com/FabianQ-S/SprivatenotesKT")
+                    startActivity(intent)
+                }
             }
             drawerLayout.closeDrawer(GravityCompat.START)
             true
