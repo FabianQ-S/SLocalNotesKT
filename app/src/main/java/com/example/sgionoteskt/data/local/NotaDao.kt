@@ -23,10 +23,10 @@ interface NotaDao {
     suspend fun eliminar(nota: Nota)
 
     @Transaction
-    @Query("SELECT * FROM notas WHERE esta_eliminado = 0 ORDER BY ultima_modificacion DESC")
+    @Query("SELECT * FROM notas WHERE esta_eliminado = 0 ORDER BY es_favorito DESC, fecha_favorito DESC, ultima_modificacion DESC")
     fun obtenerNotasConEtiquetas(): Flow<List<NotaConEtiquetas>>
 
-    @Query("SELECT * FROM notas WHERE esta_eliminado = 0 ORDER BY ultima_modificacion DESC")
+    @Query("SELECT * FROM notas WHERE esta_eliminado = 0 ORDER BY es_favorito DESC, fecha_favorito DESC, ultima_modificacion DESC")
     fun obtenerNotas(): Flow<List<Nota>>
 
     @Query("SELECT * FROM notas WHERE esta_eliminado = 1 ORDER BY ultima_modificacion DESC")

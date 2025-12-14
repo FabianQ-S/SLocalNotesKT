@@ -21,6 +21,9 @@ data class Nota(
     @ColumnInfo(name = "es_favorito")
     val esFavorito: Int = 0,
 
+    @ColumnInfo(name = "fecha_favorito")
+    val fechaFavorito: Long? = null,
+
     @ColumnInfo(name = "esta_eliminado")
     val estaEliminado: Int = 0,
 

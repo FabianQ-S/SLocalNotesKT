@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
@@ -38,8 +39,10 @@ class NotaDetalleActivity : AppCompatActivity() {
     private lateinit var etmDetalleNota: EditText
     private lateinit var btnDelete: FloatingActionButton
     private lateinit var btnEtiqueta: FloatingActionButton
+    private lateinit var btnFavorito: FloatingActionButton
     private lateinit var layoutAcciones: LinearLayout
     private lateinit var etiquetaLauncher: ActivityResultLauncher<Intent>
+    private var esFavorito: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +55,12 @@ class NotaDetalleActivity : AppCompatActivity() {
             etTitulo.setText(it.titulo)
             etmDetalleNota.setText(it.contenido)
             layoutAcciones.visibility = View.VISIBLE
+            esFavorito = it.esFavorito == 1
+            actualizarIconoFavorito()
+
+            btnFavorito.setOnClickListener {
+                toggleFavorito()
+            }
 
             btnDelete.setOnClickListener {
                 AlertDialog.Builder(this)
@@ -120,6 +129,7 @@ class NotaDetalleActivity : AppCompatActivity() {
         etmDetalleNota = findViewById(R.id.etmDetalleNota)
         btnDelete = findViewById(R.id.fabEliminar)
         btnEtiqueta = findViewById(R.id.fabEtiquetas)
+        btnFavorito = findViewById(R.id.fabFavorito)
         layoutAcciones = findViewById(R.id.fabButtonsLayout)
 
         enableEdgeToEdge()
@@ -130,6 +140,35 @@ class NotaDetalleActivity : AppCompatActivity() {
         }
 
         layoutAcciones.visibility = View.GONE
+    }
+
+    private fun actualizarIconoFavorito() {
+        if (esFavorito) {
+            btnFavorito.setImageResource(R.drawable.ic_star_filled)
+        } else {
+            btnFavorito.setImageResource(R.drawable.ic_star_outline)
+        }
+    }
+
+    private fun toggleFavorito() {
+        esFavorito = !esFavorito
+        actualizarIconoFavorito()
+
+        val notaActual = nota ?: return
+        lifecycleScope.launch(Dispatchers.IO) {
+            val db = App.database.notaDao()
+            val nuevaFechaFavorito = if (esFavorito) System.currentTimeMillis() else null
+            nota = notaActual.copy(
+                esFavorito = if (esFavorito) 1 else 0,
+                fechaFavorito = nuevaFechaFavorito,
+                ultimaModificacion = System.currentTimeMillis()
+            )
+            db.actualizar(nota!!)
+            withContext(Dispatchers.Main) {
+                val mensaje = if (esFavorito) "Agregado a favoritos" else "Eliminado de favoritos"
+                Toast.makeText(this@NotaDetalleActivity, mensaje, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupToolbar() {
@@ -237,5 +276,5 @@ class NotaDetalleActivity : AppCompatActivity() {
         }
     }
 
-
 }
+

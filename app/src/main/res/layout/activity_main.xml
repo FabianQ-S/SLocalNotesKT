@@ -32,17 +32,25 @@
 
     </LinearLayout>
 
-    <!-- Floating Action Button -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_note"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="35dp"
         android:layout_marginBottom="150dp"
-        app:srcCompat="@drawable/outline_align_flex_center_24"
-        app:tint="@android:color/white"
-        app:backgroundTint="@color/primary" />
+        android:background="@drawable/fab_gradient_wrapper">
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_note"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/outline_align_flex_center_24"
+            app:tint="@android:color/white"
+            app:backgroundTint="@android:color/transparent"
+            app:elevation="0dp"
+            app:pressedTranslationZ="0dp" />
+
+    </FrameLayout>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -51,8 +59,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:menu="@menu/bottom_navigation"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/primaryDark"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="@color/bottom_nav_colors"
         android:background="?android:attr/windowBackground"
         app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"/>
 

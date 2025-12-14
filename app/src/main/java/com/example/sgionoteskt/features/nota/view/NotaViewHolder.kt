@@ -3,6 +3,7 @@ package com.example.sgionoteskt.features.nota.view
 import android.animation.ValueAnimator
 import android.view.View
 import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sgionoteskt.R
@@ -19,6 +20,7 @@ class NotaViewHolder(
     private val titulo = itemView.findViewById<TextView>(R.id.txtTitulo)
     private val contenido = itemView.findViewById<TextView>(R.id.txtContenido)
     private val chipGroup = itemView.findViewById<ChipGroup>(R.id.chipGroupEtiquetas)
+    private val imgFavorito = itemView.findViewById<ImageView>(R.id.imgFavorito)
     private var notaActual: Nota? = null
 
     init {
@@ -32,10 +34,10 @@ class NotaViewHolder(
         titulo.text = notaConEtiquetas.nota.titulo
         contenido.text = notaConEtiquetas.nota.contenido
 
-        // Limpiar chips anteriores
+        imgFavorito.visibility = if (notaConEtiquetas.nota.esFavorito == 1) View.VISIBLE else View.GONE
+
         chipGroup.removeAllViews()
 
-        // Agregar chips
         notaConEtiquetas.etiquetas.forEach { etiqueta ->
             val chip = Chip(itemView.context).apply {
                 text = etiqueta.nombre
@@ -65,3 +67,4 @@ class NotaViewHolder(
     }
 
 }
+

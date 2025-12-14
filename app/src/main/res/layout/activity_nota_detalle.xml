@@ -105,6 +105,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="40dp"
+                android:background="@drawable/fab_gradient_wrapper">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabFavorito"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_star_outline"
+                    app:tint="@color/white"
+                    app:backgroundTint="@android:color/transparent"
+                    app:elevation="0dp"
+                    app:pressedTranslationZ="0dp"
+                    android:contentDescription="Marcar favorito" />
+
+            </FrameLayout>
+
             <!-- Recicler -->
             <FrameLayout
                 android:layout_width="56dp"
