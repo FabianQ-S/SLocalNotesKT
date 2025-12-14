@@ -132,7 +132,25 @@
 
             </FrameLayout>
 
-            <!-- Recicler -->
+            <FrameLayout
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_marginEnd="40dp"
+                android:background="@drawable/fab_gradient_wrapper">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fabInsertProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@drawable/ic_at"
+                    app:tint="@color/white"
+                    app:backgroundTint="@android:color/transparent"
+                    app:elevation="0dp"
+                    app:pressedTranslationZ="0dp"
+                    android:contentDescription="Insertar datos" />
+
+            </FrameLayout>
+
             <FrameLayout
                 android:layout_width="56dp"
                 android:layout_height="56dp"
@@ -172,6 +190,30 @@
             </FrameLayout>
 
         </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/fabInsertProfileNew"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/fab_gradient_wrapper"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fabInsertProfileNewBtn"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:srcCompat="@drawable/ic_at"
+                app:tint="@color/white"
+                app:backgroundTint="@android:color/transparent"
+                app:elevation="0dp"
+                app:pressedTranslationZ="0dp"
+                android:contentDescription="Insertar datos" />
+
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

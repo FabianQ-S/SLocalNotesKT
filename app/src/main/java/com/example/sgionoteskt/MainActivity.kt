@@ -68,15 +68,21 @@ class MainActivity : AppCompatActivity() {
         val headerView = navView.getHeaderView(0)
         avatarContainer = headerView.findViewById(R.id.drawer_avatar_container)
         avatarIcon = headerView.findViewById(R.id.drawer_avatar_icon)
+        val btnEditProfile = headerView.findViewById<ImageView>(R.id.btn_edit_profile)
 
         notaFragment = NotaFragment()
         etiquetaFragment = EtiquetaFragment()
         papeleraFragment = PapeleraFragment()
 
         loadSavedAvatar()
+        loadSavedProfile()
 
         avatarContainer.setOnClickListener {
             showAvatarPickerDialog()
+        }
+
+        btnEditProfile.setOnClickListener {
+            showProfileEditorDialog()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_content)) { view, insets ->
@@ -219,6 +225,86 @@ class MainActivity : AppCompatActivity() {
                 avatarIcon.setImageResource(avatarMap[avatarKey] ?: R.drawable.ic_user)
             }
         }
+    }
+
+    private fun showProfileEditorDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_profile_editor, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val etUsername = dialogView.findViewById<android.widget.EditText>(R.id.etUsername)
+        val etEmail = dialogView.findViewById<android.widget.EditText>(R.id.etEmail)
+        val etPhrase = dialogView.findViewById<android.widget.EditText>(R.id.etPhrase)
+        val btnCancel = dialogView.findViewById<android.widget.TextView>(R.id.btnCancel)
+        val btnSave = dialogView.findViewById<android.widget.TextView>(R.id.btnSave)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val savedUsername = App.database.userPreferenceDao().getPreference("user_name")
+            val savedEmail = App.database.userPreferenceDao().getPreference("user_email")
+            val savedPhrase = App.database.userPreferenceDao().getPreference("user_phrase")
+            withContext(Dispatchers.Main) {
+                etUsername.setText(savedUsername ?: "")
+                etEmail.setText(savedEmail ?: "")
+                etPhrase.setText(savedPhrase ?: "")
+            }
+        }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnSave.setOnClickListener {
+            val username = etUsername.text.toString().trim()
+            var email = etEmail.text.toString().trim()
+            val phrase = etPhrase.text.toString().trim()
+
+            if (email.isEmpty()) {
+                email = "example@example.com"
+            } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                android.widget.Toast.makeText(this, "Correo electrónico inválido", android.widget.Toast.LENGTH_SHORT).show()
+                etEmail.requestFocus()
+                return@setOnClickListener
+            }
+
+            saveProfile(username, email, phrase)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun saveProfile(username: String, email: String, phrase: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (username.isNotEmpty()) {
+                App.database.userPreferenceDao().setPreference(UserPreference("user_name", username))
+            }
+            App.database.userPreferenceDao().setPreference(UserPreference("user_email", email))
+            App.database.userPreferenceDao().setPreference(UserPreference("user_phrase", phrase))
+            withContext(Dispatchers.Main) {
+                updateProfileDisplay()
+            }
+        }
+    }
+
+    private fun loadSavedProfile() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val savedUsername = App.database.userPreferenceDao().getPreference("user_name")
+            val savedEmail = App.database.userPreferenceDao().getPreference("user_email")
+            withContext(Dispatchers.Main) {
+                val headerView = navView.getHeaderView(0)
+                val userNameView = headerView.findViewById<android.widget.TextView>(R.id.drawer_user_name)
+                val userEmailView = headerView.findViewById<android.widget.TextView>(R.id.drawer_user_email)
+                userNameView.text = savedUsername ?: "Usuario Ejemplo"
+                userEmailView.text = savedEmail ?: "usuario@ejemplo.com"
+            }
+        }
+    }
+
+    private fun updateProfileDisplay() {
+        loadSavedProfile()
     }
 
     fun loadFragment(fragment: Fragment) {

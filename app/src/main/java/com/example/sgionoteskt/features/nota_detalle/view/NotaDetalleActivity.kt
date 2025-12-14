@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -42,6 +43,9 @@ class NotaDetalleActivity : AppCompatActivity() {
     private lateinit var btnFavorito: FloatingActionButton
     private lateinit var layoutAcciones: LinearLayout
     private lateinit var etiquetaLauncher: ActivityResultLauncher<Intent>
+    private lateinit var btnInsertProfile: FloatingActionButton
+    private lateinit var btnInsertProfileNew: FloatingActionButton
+    private lateinit var fabInsertProfileNewContainer: android.widget.FrameLayout
     private var esFavorito: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +59,7 @@ class NotaDetalleActivity : AppCompatActivity() {
             etTitulo.setText(it.titulo)
             etmDetalleNota.setText(it.contenido)
             layoutAcciones.visibility = View.VISIBLE
+            fabInsertProfileNewContainer.visibility = View.GONE
             esFavorito = it.esFavorito == 1
             actualizarIconoFavorito()
 
@@ -111,6 +116,10 @@ class NotaDetalleActivity : AppCompatActivity() {
                 }
             }
 
+            btnInsertProfile.setOnClickListener { view ->
+                showInsertProfileMenu(view)
+            }
+
             lifecycleScope.launch(Dispatchers.IO) {
                 val notaConEtiquetas = App.database.notaDao().obtenerNotaConEtiquetas(nota!!.idNota)
                 withContext(Dispatchers.Main) {
@@ -134,7 +143,14 @@ class NotaDetalleActivity : AppCompatActivity() {
         btnDelete = findViewById(R.id.fabEliminar)
         btnEtiqueta = findViewById(R.id.fabEtiquetas)
         btnFavorito = findViewById(R.id.fabFavorito)
+        btnInsertProfile = findViewById(R.id.fabInsertProfile)
+        btnInsertProfileNew = findViewById(R.id.fabInsertProfileNewBtn)
+        fabInsertProfileNewContainer = findViewById(R.id.fabInsertProfileNew)
         layoutAcciones = findViewById(R.id.fabButtonsLayout)
+
+        btnInsertProfileNew.setOnClickListener { view ->
+            showInsertProfileMenu(view)
+        }
 
         enableEdgeToEdge()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.detailNote)) { v, insets ->
@@ -144,6 +160,7 @@ class NotaDetalleActivity : AppCompatActivity() {
         }
 
         layoutAcciones.visibility = View.GONE
+        fabInsertProfileNewContainer.visibility = View.VISIBLE
     }
 
     private fun actualizarIconoFavorito() {
@@ -201,6 +218,12 @@ class NotaDetalleActivity : AppCompatActivity() {
 
         if (titulo.isEmpty() && detalle.isEmpty()) {
             finish()
+            return
+        }
+
+        if (titulo.isEmpty()) {
+            Toast.makeText(this, "El título no puede estar vacío", Toast.LENGTH_SHORT).show()
+            etTitulo.requestFocus()
             return
         }
 
@@ -297,5 +320,55 @@ class NotaDetalleActivity : AppCompatActivity() {
         }
     }
 
-}
+    private fun showInsertProfileMenu(anchorView: View) {
+        val popup = PopupMenu(this, anchorView)
+        popup.menuInflater.inflate(R.menu.insert_profile_menu, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_insert_phrase -> {
+                    insertPhrase()
+                    true
+                }
+                R.id.menu_insert_credentials -> {
+                    insertCredentials()
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
 
+    private fun insertPhrase() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val phrase = App.database.userPreferenceDao().getPreference("user_phrase")
+            withContext(Dispatchers.Main) {
+                if (phrase.isNullOrEmpty()) {
+                    Toast.makeText(this@NotaDetalleActivity, "No hay frase favorita guardada", Toast.LENGTH_SHORT).show()
+                } else {
+                    val currentText = etmDetalleNota.text.toString()
+                    val cursorPosition = etmDetalleNota.selectionStart
+                    val newText = currentText.substring(0, cursorPosition) + phrase + currentText.substring(cursorPosition)
+                    etmDetalleNota.setText(newText)
+                    etmDetalleNota.setSelection(cursorPosition + phrase.length)
+                }
+            }
+        }
+    }
+
+    private fun insertCredentials() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val username = App.database.userPreferenceDao().getPreference("user_name") ?: "Usuario Ejemplo"
+            val email = App.database.userPreferenceDao().getPreference("user_email") ?: "usuario@ejemplo.com"
+            val credentials = "$username\n$email"
+            withContext(Dispatchers.Main) {
+                val currentText = etmDetalleNota.text.toString()
+                val cursorPosition = etmDetalleNota.selectionStart
+                val newText = currentText.substring(0, cursorPosition) + credentials + currentText.substring(cursorPosition)
+                etmDetalleNota.setText(newText)
+                etmDetalleNota.setSelection(cursorPosition + credentials.length)
+            }
+        }
+    }
+
+}
