@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/drawer_menu_group">
+        <item
+            android:id="@+id/nav_notes"
+            android:icon="@drawable/note_icon"
+            android:title="Mis Notas" />
+
+        <item
+            android:id="@+id/nav_tags"
+            android:icon="@drawable/tag_icon"
+            android:title="Etiquetas" />
+
+        <item
+            android:id="@+id/nav_trash"
+            android:icon="@drawable/trash_icon"
+            android:title="Papelera" />
+    </group>
+
+</menu>

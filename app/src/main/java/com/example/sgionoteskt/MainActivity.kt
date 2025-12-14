@@ -2,10 +2,13 @@ package com.example.sgionoteskt
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.example.sgionoteskt.features.etiqueta.view.EtiquetaFragment
 import com.example.sgionoteskt.features.nota.view.NotaFragment
@@ -13,6 +16,7 @@ import com.example.sgionoteskt.features.nota_detalle.view.NotaDetalleActivity
 import com.example.sgionoteskt.features.papelera.view.PapeleraFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +26,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navigation: BottomNavigationView
     private lateinit var btnNuevaNota: FloatingActionButton
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+    private lateinit var btnMenu: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +39,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navView = findViewById(R.id.nav_view)
+        btnMenu = findViewById(R.id.btn_menu)
         navigation = findViewById(R.id.bottom_navigation)
 
         notaFragment = NotaFragment()
@@ -52,9 +62,12 @@ class MainActivity : AppCompatActivity() {
         btnNuevaNota = findViewById(R.id.fab_add_note)
 
         btnNuevaNota.setOnClickListener {
-            val intent = Intent(this,
-                NotaDetalleActivity::class.java)
+            val intent = Intent(this, NotaDetalleActivity::class.java)
             startActivity(intent)
+        }
+
+        btnMenu.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
         }
 
         loadFragment(notaFragment)
@@ -76,6 +89,25 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when(menuItem.itemId) {
+                R.id.nav_notes -> {
+                    loadFragment(notaFragment)
+                    navigation.selectedItemId = R.id.notes
+                }
+                R.id.nav_tags -> {
+                    loadFragment(etiquetaFragment)
+                    navigation.selectedItemId = R.id.tags
+                }
+                R.id.nav_trash -> {
+                    loadFragment(papeleraFragment)
+                    navigation.selectedItemId = R.id.trash
+                }
+            }
+            drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
     }
 
     fun loadFragment(fragment: Fragment) {
@@ -84,4 +116,11 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
+    override fun onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
