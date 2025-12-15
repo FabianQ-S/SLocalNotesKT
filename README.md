@@ -1,3 +1,4 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/FabianQ-S/SLocalNotesKT)
 <!-- Centrado y con ancho máximo de 300px -->
 <p align="center">
   <img src="icon.jpeg" alt="SLocalNotesKT" width="300px" />
