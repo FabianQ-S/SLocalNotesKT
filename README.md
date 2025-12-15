@@ -14,8 +14,6 @@ Una aplicación Android moderna para crear, organizar y recordar notas asociadas
 - ⭐ **Favoritos**: Marca notas y etiquetas como favoritas para acceso rápido
 - 🗑️ **Papelera**: Eliminación lógica con opción de restauración
 - 💾 **Almacenamiento Local SQLite**: Acceso sin conexión garantizado
-- 📤 **Exportación de Datos**: Backup en JSON para seguridad y portabilidad
-- 📥 **Importación de Datos**: Restaura backups en cualquier momento
 - 🔄 **Sincronización Local**: Actualizaciones instantáneas en la UI
 - 👤 **Perfil Local**: Nombre e ícono personalizable almacenados localmente
 
@@ -66,7 +64,6 @@ La aplicación sigue una arquitectura **MVVM** (Model-View-ViewModel) clara y es
 | **Arquitectura** | MVVM · Repository Pattern |
 | **Asincronía** | Coroutines · Flow |
 | **Reactive** | LiveData · StateFlow |
-| **Serialización** | Gson/Moshi (JSON/XML) |
 | **Build Tool** | Gradle 8.x |
 
 ## 📊 Entidades de Base de Datos
@@ -127,23 +124,6 @@ UI (Activities/Fragments)
    SQLite Database
 ```
 
-## 📤 Exportación e Importación
-
-### Formatos Soportados
-- **JSON**: Formato ligero y legible
-- **XML**: Formato estructurado y compatible
-
-### Estructura de Backup
-```json
-{
-  "timestamp": "2025-01-15T10:30:00Z",
-  "version": "1.0",
-  "userProfile": { /* datos usuario */ },
-  "notes": [ /* notas con tags */ ],
-  "tags": [ /* etiquetas */ ]
-}
-```
-
 ## ⚙️ Dependencias Principales
 
 ```kotlin
@@ -195,17 +175,6 @@ implementation("com.google.code.gson:gson:2.10.x")
 4. Asigna etiquetas (opcional)
 5. Guarda automáticamente
 
-### Exportar Datos
-1. Accede al menú de preferencias
-2. Selecciona "Exportar datos"
-3. Elige formato (JSON/XML)
-4. Guarda en el almacenamiento del dispositivo
-
-### Importar Datos
-1. Accede al menú de preferencias
-2. Selecciona "Importar datos"
-3. Selecciona el archivo de backup
-4. Confirma la importación
 
 ## 📱 Requisitos del Sistema
 
